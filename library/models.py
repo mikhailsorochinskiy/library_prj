@@ -14,7 +14,7 @@ class Book(models.Model):
     title = models.CharField(max_length=200)
     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name='books')
     description = models.TextField()
-    preview_image = models.ImageField(upload_to='book_covers/')
+    preview_image = models.ImageField(upload_to='book_covers/', blank=True, null=True)
 
     content_text = models.TextField(
         blank=True,
