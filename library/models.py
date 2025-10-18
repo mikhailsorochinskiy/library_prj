@@ -6,6 +6,10 @@ class Author(models.Model):
     bio = models.TextField(blank=True)
     photo = models.ImageField(upload_to='authors/', null=True, blank=True)
 
+    class Meta:
+        verbose_name = 'Автор'
+        verbose_name_plural = 'Авторы'
+
     def __str__(self):
         return self.name
 
@@ -23,6 +27,10 @@ class Book(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        verbose_name = 'Книга'
+        verbose_name_plural = 'Книги'
 
     def __str__(self):
         return f"{self.title} - {self.author.name}"
