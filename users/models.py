@@ -7,7 +7,7 @@ class User(AbstractUser):
     email = models.EmailField(unique=True, verbose_name='Email')
     avatar = models.ImageField(upload_to='avatars', blank=True, null=True, verbose_name="Аватар",
                                help_text='Загрузите фото для вашей аватарки')
-    city = models.CharField(max_length=50, blank=True, null=True, help_text='Ваш город', verbose_name='Город')
+    points = models.IntegerField(default=0, verbose_name="Баллы")
 
     USERNAME_FIELD = 'email'
     REQUIRED_FIELDS = ['username']
