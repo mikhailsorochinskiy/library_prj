@@ -26,6 +26,7 @@ class SelectedBook(models.Model):
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="book")
 
     class Meta:
+        unique_together = ("user", "book")
         verbose_name = 'Избранная книга'
         verbose_name_plural = 'Избранные книги'
 
@@ -38,8 +39,9 @@ class SubscribeAuthor(models.Model):
     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name="author")
 
     class Meta:
+        unique_together = ("user", "author")
         verbose_name = 'Подписка на автора'
         verbose_name_plural = 'Подписки на автора'
 
     def __str__(self):
-        return f'Пользователь {self.user} подписался на автора {self.author}'
+        return f'Пользователь {self.user} подписался на автора {self.author.name}'
