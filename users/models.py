@@ -22,7 +22,7 @@ class User(AbstractUser):
 
 
 class SelectedBook(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="selected_books")
     book = models.ForeignKey(Book, on_delete=models.CASCADE, related_name="book")
 
     class Meta:
@@ -35,7 +35,7 @@ class SelectedBook(models.Model):
 
 
 class SubscribeAuthor(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="subscribes")
     author = models.ForeignKey(Author, on_delete=models.CASCADE, related_name="author")
 
     class Meta:

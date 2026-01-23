@@ -1,20 +1,40 @@
 from rest_framework import serializers
 from .models import User, SelectedBook, SubscribeAuthor
+from library.serializers import BookSerializer, AuthorSerializer
+from library.models import Book, Author
+
+
+class SelectedBookSerializer(serializers.ModelSerializer):
+    book = BookSerializer(read_only=True)
+    book_id = serializers.PrimaryKeyRelatedField(
+        queryset=Book.objects.all(),
+        source='book',
+        write_only=True
+    )
+
+    class Meta:
+        model = SelectedBook
+        fields = ['id', 'book', 'book_id']
+
+
+class SubscribeAuthorSerializer(serializers.ModelSerializer):
+    author = AuthorSerializer(read_only=True)
+    author_id = serializers.PrimaryKeyRelatedField(
+        queryset=Author.objects.all(),
+        source='author',
+        write_only=True
+    )
+
+    class Meta:
+        model = SubscribeAuthor
+        fields = ['id', 'author', 'author_id']
 
 
 class UserSerializer(serializers.ModelSerializer):
-    selected_books = serializers.SerializerMethodField()
 
-    def get_selected_books(self, obj):
-        user = self.context.get("request").user
-        if not user:
-            return False
-        selected_books = SelectedBook.objects.filter(user=user)
-        result = []
-        for selected_book in selected_books:
-            result.append(selected_book.book.title)
-        return result
+    selected_books = SelectedBookSerializer(many=True, read_only=True)
+    subscribes = SubscribeAuthorSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'avatar', 'points', 'selected_books')
+        fields = ('id', 'email', 'avatar', 'points', 'selected_books', 'subscribes')
