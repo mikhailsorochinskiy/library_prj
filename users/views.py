@@ -2,8 +2,8 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
-from .models import User, SubscribeAuthor, SelectedBook
-from .serializers import UserSerializer
+from .models import User, SubscribeAuthor, SelectedBook, Comment
+from .serializers import UserSerializer, CommentSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from library.models import Author, Book
 
@@ -55,3 +55,13 @@ class SelectedBookApiView(APIView):
             SelectedBook.objects.create(user=user, book=book_item)
             message = 'Книга добавлена в избранное'
         return Response({"message": message})
+
+
+class CommentViewSet(viewsets.ModelViewSet):
+    serializer_class = CommentSerializer
+    queryset = Comment.objects.all()
+
+    def perform_create(self, serializer):
+        comment = serializer.save()
+        comment.owner = self.request.user
+        comment.save()

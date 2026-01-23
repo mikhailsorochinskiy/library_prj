@@ -45,3 +45,16 @@ class SubscribeAuthor(models.Model):
 
     def __str__(self):
         return f'Пользователь {self.user} подписался на автора {self.author.name}'
+
+
+class Comment(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    text = models.TextField(max_length=500, verbose_name="текст")
+
+    def __str__(self):
+        return f'{self.user} оставил коммент под книгой {self.book}.'
+
+    class Meta:
+        verbose_name = 'Коммент'
+        verbose_name_plural = 'Комменты'
