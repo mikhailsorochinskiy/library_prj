@@ -45,3 +45,8 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'owner', 'book', 'text')
+
+
+class AddPointsSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    points = serializers.IntegerField(min_value=1, max_value=100)
