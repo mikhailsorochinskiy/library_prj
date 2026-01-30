@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes
-from .models import User, SubscribeAuthor, SelectedBook, Comment
+from .models import User, SubscribeAuthor, SelectedBook, Comment, ScoreLog
 from .serializers import UserSerializer, CommentSerializer, AddPointsSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from library.models import Author, Book
@@ -40,6 +40,10 @@ class SubscribeAuthorApiView(APIView):
         else:
             SubscribeAuthor.objects.create(user=user, author=author_item)
             message = 'Подписка добавлена'
+            subscribe_before = ScoreLog.objects.filter(user=user, author=author_item)
+            if not subscribe_before.exists():
+                UserService.add_points(user.email, 2)
+                ScoreLog.objects.create(user=user, author=author_item, points=2)
         return Response({"message": message})
 
 
@@ -57,6 +61,10 @@ class SelectedBookApiView(APIView):
         else:
             SelectedBook.objects.create(user=user, book=book_item)
             message = 'Книга добавлена в избранное'
+            selected_book_before = ScoreLog.objects.filter(user=user, book=book_item, comment=False)
+            if not selected_book_before.exists():
+                UserService.add_points(user.email, 1)
+                ScoreLog.objects.create(user=user, book=book_item, points=1)
         return Response({"message": message})
 
 
@@ -68,6 +76,12 @@ class CommentViewSet(viewsets.ModelViewSet):
         comment = serializer.save()
         comment.owner = self.request.user
         comment.save()
+
+        owner = self.request.user
+        comments = ScoreLog.objects.filter(book=comment.book, user=owner, comment=True)
+        if len(comments) < 3:
+            UserService.add_points(owner.email, 5)
+            ScoreLog.objects.create(book=comment.book, user=owner, points=5, comment=True)
 
 
 @api_view(['POST'])

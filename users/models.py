@@ -59,3 +59,11 @@ class Comment(models.Model):
     class Meta:
         verbose_name = 'Коммент'
         verbose_name_plural = 'Комменты'
+
+
+class ScoreLog(models.Model):
+    user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    book = models.ForeignKey(Book, on_delete=models.SET_NULL, null=True)
+    author = models.ForeignKey(Author, on_delete=models.SET_NULL, null=True)
+    comment = models.BooleanField(default=False)
+    points = models.IntegerField()
