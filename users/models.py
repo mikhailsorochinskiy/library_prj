@@ -54,7 +54,7 @@ class Comment(models.Model):
     text = models.TextField(max_length=500, verbose_name="текст")
 
     def __str__(self):
-        return f'{self.user} оставил коммент под книгой {self.book}.'
+        return f'{self.owner} оставил коммент под книгой {self.book}.'
 
     class Meta:
         verbose_name = 'Коммент'
