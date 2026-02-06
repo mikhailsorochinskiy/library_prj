@@ -15,7 +15,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG_from_env_file = os.getenv('DEBUG')
+if DEBUG_from_env_file == 'False':
+    DEBUG = False
+else:
+    DEBUG = True
 
 ALLOWED_HOSTS = ['library-prj.onrender.com']
 
