@@ -116,6 +116,20 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+# Для продакшена на Render
+if not DEBUG:
+    # Папка, где будут собираться статичные файлы
+    STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+
+    # Включи WhiteNoise для обработки статики
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+
+    # Добавь WhiteNoise в middleware (очень важно!)
+    MIDDLEWARE.append(
+        'whitenoise.middleware.WhiteNoiseMiddleware')  # ← ДОБАВЬ ЭТО
+else:
+    # Для разработки
+    STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
