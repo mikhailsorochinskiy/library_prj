@@ -86,6 +86,7 @@ if DATABASE_URL:
             ssl_require=True
         )
     }
+    print("✅ Using PostgreSQL from DATABASE_URL")
 else:
     # Локальная разработка
     DATABASES = {
@@ -98,6 +99,7 @@ else:
             'PORT': os.getenv('POSTGRES_PORT'),
         }
     }
+    print("⚠️ Using local PostgreSQL - check DATABASE_URL on Render!")
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
