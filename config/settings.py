@@ -39,11 +39,13 @@ INSTALLED_APPS = [
     'users',
     'library',
     'django_filters',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -171,3 +173,39 @@ SIMPLE_JWT = {
     "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
+
+# Вариант A: Разреши всё (для разработки)
+CORS_ALLOW_ALL_ORIGINS = True  # ← поставь True пока
+
+# Вариант B: Разреши только определённые домены (для продакшена)
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",  # React dev server
+#     "http://localhost:8080",  # Vue dev server
+#     "https://ваш-фронтенд.сайт",  # твой фронтенд
+# ]
+
+# Разреши отправку cookies (если нужна аутентификация)
+CORS_ALLOW_CREDENTIALS = True
+
+# Разрешенные методы
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+# Разрешенные заголовки
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
