@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
 from .models import User, SubscribeAuthor, SelectedBook, Comment, ScoreLog
 from .serializers import UserSerializer, CommentSerializer, AddPointsSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
@@ -24,6 +24,12 @@ class UserViewSet(viewsets.ModelViewSet):
         user = serializer.save()
         user.set_password(user.password)
         user.save()
+
+    @action(detail=False, methods=['get'])
+    def me(self, request):
+        """Текущий пользователь"""
+        serializer = self.get_serializer(request.user)
+        return Response(serializer.data)
 
 
 class SubscribeAuthorApiView(APIView):
