@@ -1,13 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from library.models import Book, Author
-
+from .validators import validate_email, validate_comment_text
 
 class User(AbstractUser):
     username = models.CharField(max_length=150, blank=True, null=True)
-    email = models.EmailField(unique=True, verbose_name='Email')
-    avatar = models.ImageField(upload_to='avatars', blank=True, null=True, verbose_name="Аватар",
-                               help_text='Загрузите фото для вашей аватарки')
+    email = models.EmailField(unique=True, validators=[validate_email], verbose_name='Email')
     points = models.IntegerField(default=0, verbose_name="Баллы")
     is_tested = models.BooleanField(default=False, verbose_name="Прошел тест?")
 
@@ -51,7 +49,7 @@ class SubscribeAuthor(models.Model):
 class Comment(models.Model):
     owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     book = models.ForeignKey(Book, on_delete=models.CASCADE)
-    text = models.TextField(max_length=500, verbose_name="текст")
+    text = models.TextField(max_length=500, validators=[validate_comment_text], verbose_name="текст")
 
     def __str__(self):
         return f'{self.owner} оставил коммент под книгой {self.book}.'

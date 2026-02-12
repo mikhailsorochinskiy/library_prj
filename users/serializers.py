@@ -2,6 +2,7 @@ from rest_framework import serializers
 from .models import User, SelectedBook, SubscribeAuthor, Comment
 from library.serializers import BookSerializer, AuthorSerializer
 from library.models import Book, Author
+from .validators import validate_user_password, validate_email
 
 
 class SelectedBookSerializer(serializers.ModelSerializer):
@@ -35,9 +36,29 @@ class UserSerializer(serializers.ModelSerializer):
     selected_books = SelectedBookSerializer(many=True, read_only=True)
     subscribes = SubscribeAuthorSerializer(many=True, read_only=True)
 
+    password = serializers.CharField(
+        write_only=True,
+        required=False,  # Не обязателен при обновлении
+        style={'input_type': 'password'},  # Для browsable API
+        validators=[validate_user_password]  # Если есть валидатор
+    )
+
     class Meta:
         model = User
-        fields = ('id', 'email', 'password', 'avatar', 'points', 'selected_books', 'subscribes')
+        fields = ('id', 'email', 'password', 'points', 'selected_books', 'subscribes')
+        extra_kwargs = {
+            'email': {
+                'required': True,
+                'validators': [validate_email]  # Если есть валидатор
+            },
+            'points': {
+                'read_only': True,  # Баллы начисляются только через тесты
+            },
+            'password': {
+                'write_only': True,  # Дублируем здесь для надежности
+                'min_length': 8,
+            }
+        }
 
 
 class CommentSerializer(serializers.ModelSerializer):

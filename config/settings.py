@@ -22,7 +22,7 @@ if DEBUG_from_env_file == 'False':
 else:
     DEBUG = True
 
-ALLOWED_HOSTS = ['library-prj.onrender.com', 'localhost']
+ALLOWED_HOSTS = ['library-prj.onrender.com', '127.0.0.1']
 
 
 # Application definition
