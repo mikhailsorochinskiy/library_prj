@@ -154,6 +154,14 @@ else:
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# Настройки для загрузки файлов
+FILE_UPLOAD_MAX_MEMORY_SIZE = 10 * 1024 * 1024  # 10 МБ в памяти
+FILE_UPLOAD_PERMISSIONS = 0o644  # права доступа к файлам
+DATA_UPLOAD_MAX_MEMORY_SIZE = 50 * 1024 * 1024  # 50 МБ для всего запроса
+
+# Разрешенные типы файлов (для безопасности)
+SECURE_CONTENT_TYPE_NOSNIFF = True
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
 

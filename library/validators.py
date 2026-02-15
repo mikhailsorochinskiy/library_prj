@@ -159,3 +159,15 @@ def validate_text_link(value):
                 _('Введите корректный URL-адрес'),
                 code='invalid_url'
             )
+
+def validate_text_file_size(value):
+    """
+    Проверка размера файла (макс 50 МБ)
+    """
+    max_size = 50 * 1024 * 1024  # 50 МБ в байтах
+
+    if value.size > max_size:
+        raise ValidationError(
+            _(f'Файл слишком большой. Максимальный размер: 50 МБ'),
+            params={'max_size': '50 МБ'},
+        )
