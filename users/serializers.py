@@ -32,7 +32,8 @@ class SubscribeAuthorSerializer(serializers.ModelSerializer):
 
 
 class UserSerializer(serializers.ModelSerializer):
-
+    is_moderator = serializers.BooleanField(read_only=True)
+    role = serializers.SerializerMethodField()
     selected_books = SelectedBookSerializer(many=True, read_only=True)
     subscribes = SubscribeAuthorSerializer(many=True, read_only=True)
 
@@ -45,7 +46,8 @@ class UserSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ('id', 'email', 'password', 'points', 'selected_books', 'subscribes')
+        fields = ('id', 'email', 'password', 'points', 'selected_books', 'subscribes', 'is_moderator', 'role')
+        read_only_fields = ('points', 'is_moderator')
         extra_kwargs = {
             'email': {
                 'required': True,
@@ -59,6 +61,14 @@ class UserSerializer(serializers.ModelSerializer):
                 'min_length': 8,
             }
         }
+
+    def get_role(self, obj):
+        if obj.is_staff:
+            return 'admin'
+        elif obj.is_moderator:
+            return 'moderator'
+        else:
+            return 'reader'
 
 
 class CommentSerializer(serializers.ModelSerializer):

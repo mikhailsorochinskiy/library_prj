@@ -9,6 +9,9 @@ from .serializers import UserSerializer, CommentSerializer, AddPointsSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from library.models import Author, Book
 from .services import UserService
+from .permissions import IsOwnerOrReadOnly
+from rest_framework.permissions import IsAdminUser
+from django.contrib.auth.models import Group
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -16,9 +19,38 @@ class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
 
     def get_permissions(self):
-        if self.action in ['create', 'login']:
-            return [AllowAny()]
-        return [IsAuthenticated()]
+        if self.action == 'create':
+            # Регистрация доступна всем
+            permission_classes = []
+        elif self.action in ['update', 'partial_update', 'destroy']:
+            # Изменение профиля только владельцу
+            permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+        elif self.action == 'list':
+            # Список пользователей только админам
+            permission_classes = [IsAdminUser]
+        elif self.action == 'make_moderator':
+            # Назначение модератора только админам
+            permission_classes = [IsAdminUser]
+        else:
+            permission_classes = [IsAuthenticated]
+
+        return [permission() for permission in permission_classes]
+
+    @action(detail=True, methods=['post'])
+    def make_moderator(self, request, pk=None):
+        """Назначить пользователя модератором (только админ)"""
+        user = self.get_object()
+        moderators_group = Group.objects.get(name='Moderators')
+        user.groups.add(moderators_group)
+        return Response({'status': 'moderator added'})
+
+    @action(detail=True, methods=['post'])
+    def remove_moderator(self, request, pk=None):
+        """Снять права модератора (только админ)"""
+        user = self.get_object()
+        moderators_group = Group.objects.get(name='Moderators')
+        user.groups.remove(moderators_group)
+        return Response({'status': 'moderator removed'})
 
     def perform_create(self, serializer):
         user = serializer.save()
@@ -77,6 +109,7 @@ class SelectedBookApiView(APIView):
 class CommentViewSet(viewsets.ModelViewSet):
     serializer_class = CommentSerializer
     queryset = Comment.objects.all()
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
 
     def perform_create(self, serializer):
         comment = serializer.save()

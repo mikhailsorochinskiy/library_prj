@@ -9,11 +9,22 @@ from django.shortcuts import get_object_or_404
 from .models import Author, Book
 from .serializers import AuthorSerializer, BookSerializer
 from .filters import BookFilter
+from .paginators import ListPagination
+from users.permissions import IsModeratorOrReadOnly
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
     queryset = Author.objects.all()
     serializer_class = AuthorSerializer
+    pagination_class = ListPagination
+
+    def get_permissions(self):
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            permission_classes = [IsModeratorOrReadOnly]
+        else:
+            permission_classes = [IsAuthenticated]
+
+        return [permission() for permission in permission_classes]
 
 
 class BookViewSet(viewsets.ModelViewSet):
@@ -21,6 +32,27 @@ class BookViewSet(viewsets.ModelViewSet):
     serializer_class = BookSerializer
     filter_backends = [DjangoFilterBackend]
     filterset_class = BookFilter
+    pagination_class = ListPagination
+
+    def get_permissions(self):
+        """
+        Разные права для разных действий
+        """
+        if self.action in ['create', 'update', 'partial_update', 'destroy']:
+            # Создание/изменение/удаление только модераторам
+            permission_classes = [IsModeratorOrReadOnly]
+        elif self.action == 'list':
+            # Список книг могут видеть все аутентифицированные
+            permission_classes = [IsAuthenticated]
+        else:
+            # Детали книги могут видеть все аутентифицированные
+            permission_classes = [IsAuthenticated]
+
+        return [permission() for permission in permission_classes]
+
+    def get_queryset(self):
+        """Базовый queryset для всех"""
+        return Book.objects.all()
 
 
 @api_view(['POST'])
