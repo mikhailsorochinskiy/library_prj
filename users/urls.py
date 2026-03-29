@@ -1,6 +1,7 @@
 from django.urls import path
 from rest_framework.routers import DefaultRouter
-from .views import UserViewSet, SelectedBookApiView, SubscribeAuthorApiView, CommentViewSet, add_test_points
+from .views import (UserViewSet, SelectedBookApiView, SubscribeAuthorApiView, CommentViewSet, RatingViewSet,
+                    add_test_points)
 from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
@@ -11,6 +12,7 @@ app_name = 'users'
 router = DefaultRouter()
 router.register(r'users', UserViewSet, basename='users')
 router.register(r'comments', CommentViewSet, basename='comments')
+router.register(r'ratings', RatingViewSet, basename='ratings')
 
 
 urlpatterns = [

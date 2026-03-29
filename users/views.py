@@ -4,8 +4,8 @@ from rest_framework.views import APIView
 from rest_framework.generics import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import api_view, permission_classes, action
-from .models import User, SubscribeAuthor, SelectedBook, Comment, ScoreLog
-from .serializers import UserSerializer, CommentSerializer, AddPointsSerializer
+from .models import User, SubscribeAuthor, SelectedBook, Comment, ScoreLog, Rating
+from .serializers import UserSerializer, CommentSerializer, AddPointsSerializer, RatingSerializer
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from library.models import Author, Book
 from .services import UserService
@@ -121,6 +121,23 @@ class CommentViewSet(viewsets.ModelViewSet):
         if len(comments) < 3:
             UserService.add_points(owner.email, 5)
             ScoreLog.objects.create(book=comment.book, user=owner, points=5, comment=True)
+
+
+class RatingViewSet(viewsets.ModelViewSet):
+    serializer_class = RatingSerializer
+    queryset = Rating.objects.all()
+    permission_classes = [IsAuthenticated, IsOwnerOrReadOnly]
+
+    def perform_create(self, serializer):
+        comment = serializer.save()
+        comment.owner = self.request.user
+        comment.save()
+
+        owner = self.request.user
+        rating = ScoreLog.objects.filter(book=comment.book, user=owner, rating=True)
+        if not rating:
+            UserService.add_points(owner.email, 2)
+            ScoreLog.objects.create(book=comment.book, user=owner, points=2, rating=True)
 
 
 @api_view(['POST'])

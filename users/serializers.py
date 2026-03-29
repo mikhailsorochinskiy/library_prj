@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, SelectedBook, SubscribeAuthor, Comment
+from .models import User, SelectedBook, SubscribeAuthor, Comment, Rating
 from library.serializers import BookSerializer, AuthorSerializer
 from library.models import Book, Author
 from .validators import validate_user_password, validate_email
@@ -76,6 +76,13 @@ class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
         fields = ('id', 'owner', 'book', 'text')
+
+
+class RatingSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Rating
+        fields = ('id', 'owner', 'book', 'rating')
 
 
 class AddPointsSerializer(serializers.Serializer):

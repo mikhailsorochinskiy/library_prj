@@ -2,6 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from library.models import Book, Author
 from .validators import validate_email, validate_comment_text
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 class User(AbstractUser):
     username = models.CharField(max_length=150, blank=True, null=True)
@@ -63,9 +64,27 @@ class Comment(models.Model):
         verbose_name_plural = 'Комменты'
 
 
+class Rating(models.Model):
+    owner = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
+    book = models.ForeignKey(Book, on_delete=models.CASCADE)
+    rating = models.IntegerField(verbose_name="оценка", validators=[
+            MinValueValidator(1, message='Оценка не может быть меньше 1'),
+            MaxValueValidator(10, message='Оценка не может быть больше 10')
+        ])
+
+    def __str__(self):
+        return f'{self.owner} поставил оценку {self.rating} под книгой {self.book}.'
+
+    class Meta:
+        verbose_name = 'Оценка'
+        verbose_name_plural = 'Оценки'
+        unique_together = ['owner', 'book']
+
+
 class ScoreLog(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, blank=True, null=True)
     book = models.ForeignKey(Book, on_delete=models.SET_NULL, null=True)
     author = models.ForeignKey(Author, on_delete=models.SET_NULL, null=True)
     comment = models.BooleanField(default=False)
+    rating = models.BooleanField(default=False)
     points = models.IntegerField()
