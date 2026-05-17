@@ -4,7 +4,10 @@ from .models import User, Comment, SelectedBook, SubscribeAuthor, ScoreLog
 
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
-    list_display = ('id', 'email', 'points', 'is_tested')
+    list_display = ('id', 'email', 'points', 'is_tested', 'is_active', 'is_staff')
+    list_display_links = ('id', 'email')
+    search_fields = ('email',)
+    list_filter = ('is_tested', 'is_active', 'is_staff', 'groups')
 
 
 @admin.register(Comment)
