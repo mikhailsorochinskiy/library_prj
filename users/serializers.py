@@ -3,6 +3,11 @@ from .models import User, SelectedBook, SubscribeAuthor, Comment, Rating
 from library.serializers import BookSerializer, AuthorSerializer
 from library.models import Book, Author
 from .validators import validate_user_password, validate_email
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 class SelectedBookSerializer(serializers.ModelSerializer):
@@ -61,6 +66,34 @@ class UserSerializer(serializers.ModelSerializer):
                 'min_length': 8,
             }
         }
+
+    def create(self, validated_data):
+        password = validated_data.pop('password', None)
+        # 1. Создаем пользователя, но пока блокируем вход (is_active=False)
+        validated_data['is_active'] = False
+        user = super().create(validated_data)
+
+        if password:
+            user.set_password(password)
+            user.save()
+
+        # 2. Генерируем токен и ID для ссылки
+        uid = urlsafe_base64_encode(force_bytes(user.pk))
+        token = default_token_generator.make_token(user)
+
+        # 3. Формируем ссылку с использованием FRONTEND_URL
+        verify_url = f"{settings.FRONTEND_URL}/verify-email/{uid}/{token}/"
+
+        # 4. Отправляем письмо (пока упадет в консоль)
+        send_mail(
+            subject="Подтверждение регистрации",
+            message=f"Добро пожаловать в нашу библиотеку!\n\nДля подтверждения почты перейдите по ссылке:\n{verify_url}",
+            from_email=settings.DEFAULT_FROM_EMAIL,
+            recipient_list=[user.email],
+            fail_silently=True,
+        )
+
+        return user
 
     def get_role(self, obj):
         if obj.is_staff:

@@ -6,6 +6,7 @@ from rest_framework_simplejwt.views import (
     TokenObtainPairView,
     TokenRefreshView,
 )
+from .views import VerifyEmailView, PasswordResetRequestView, PasswordResetConfirmView
 
 app_name = 'users'
 
@@ -21,4 +22,7 @@ urlpatterns = [
     path('subscribes/', SubscribeAuthorApiView.as_view(), name='subscribe_author'),
     path('selected-book/', SelectedBookApiView.as_view(), name='selected_book'),
     path('api/add-test-points/', add_test_points, name='add-test-points'),
+    path('auth/verify-email/', VerifyEmailView.as_view(), name='verify-email'),
+    path('auth/password-reset/', PasswordResetRequestView.as_view(), name='password-reset-request'),
+    path('auth/password-reset-confirm/', PasswordResetConfirmView.as_view(), name='password-reset-confirm'),
 ] + router.urls

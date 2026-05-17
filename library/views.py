@@ -52,7 +52,7 @@ class BookViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         """Базовый queryset для всех"""
-        return Book.objects.all()
+        return Book.objects.select_related('author').prefetch_related('comment_set').all()
 
 
 @api_view(['POST'])

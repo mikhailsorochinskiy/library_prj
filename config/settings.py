@@ -16,11 +16,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG_from_env_file = os.getenv('DEBUG')
-if DEBUG_from_env_file == 'False':
-    DEBUG = False
-else:
-    DEBUG = True
+DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 't')
+
+FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
 
 ALLOWED_HOSTS = ['library-prj.onrender.com', '127.0.0.1']
 
@@ -218,3 +216,15 @@ CORS_ALLOW_HEADERS = [
     'x-csrftoken',
     'x-requested-with',
 ]
+
+# На время разработки письма будут падать в консоль терминала
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'noreply@library.com'
+# Для продакшена потом поменяешь на:
+# EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+# EMAIL_HOST = 'smtp.gmail.com'
+# EMAIL_PORT = 587
+# EMAIL_USE_TLS = True
+# EMAIL_HOST_USER = os.getenv('EMAIL_USER')
+# EMAIL_HOST_PASSWORD = os.getenv('EMAIL_PASSWORD')
+# DEFAULT_FROM_EMAIL = EMAIL_HOST_USER

@@ -12,6 +12,11 @@ from .services import UserService
 from .permissions import IsOwnerOrReadOnly
 from rest_framework.permissions import IsAdminUser
 from django.contrib.auth.models import Group
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode, urlsafe_base64_decode
+from django.utils.encoding import force_bytes, force_str
+from django.core.mail import send_mail
+from django.conf import settings
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -51,11 +56,6 @@ class UserViewSet(viewsets.ModelViewSet):
         moderators_group = Group.objects.get(name='Moderators')
         user.groups.remove(moderators_group)
         return Response({'status': 'moderator removed'})
-
-    def perform_create(self, serializer):
-        user = serializer.save()
-        user.set_password(user.password)
-        user.save()
 
     @action(detail=False, methods=['get'])
     def me(self, request):
@@ -192,3 +192,75 @@ def add_test_points(request):
             'success': False,
             'message': f'Пользователь с данным email не найден. {e}'
         })
+
+
+class VerifyEmailView(APIView):
+    """Подтверждение email при регистрации (токен приходит от фронтенда)"""
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        uidb64 = request.data.get('uid')
+        token = request.data.get('token')
+
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user is not None and default_token_generator.check_token(user, token):
+            user.is_active = True
+            user.save()
+            return Response({"message": "Email успешно подтвержден. Теперь вы можете войти."},
+                            status=status.HTTP_200_OK)
+        return Response({"error": "Неверная или устаревшая ссылка"}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class PasswordResetRequestView(APIView):
+    """Запрос на сброс пароля (отправка письма с ссылкой)"""
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        email = request.data.get('email')
+        user = User.objects.filter(email=email).first()
+
+        if user:
+            uid = urlsafe_base64_encode(force_bytes(user.pk))
+            token = default_token_generator.make_token(user)
+
+            # Используем FRONTEND_URL для формирования ссылки
+            reset_url = f"{settings.FRONTEND_URL}/reset-password/{uid}/{token}/"
+
+            send_mail(
+                subject="Сброс пароля",
+                message=f"Вы запросили сброс пароля.\n\nДля установки нового пароля перейдите по ссылке:\n{reset_url}",
+                from_email=settings.DEFAULT_FROM_EMAIL,
+                recipient_list=[user.email],
+            )
+
+        # Всегда возвращаем ОК (200), даже если email не найден (защита от сканирования БД хакерами)
+        return Response({"message": "Если email существует в системе, письмо со ссылкой отправлено"},
+                        status=status.HTTP_200_OK)
+
+
+class PasswordResetConfirmView(APIView):
+    """Установка нового пароля (токен и пароль приходят от фронтенда)"""
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        uidb64 = request.data.get('uid')
+        token = request.data.get('token')
+        new_password = request.data.get('new_password')
+
+        try:
+            uid = force_str(urlsafe_base64_decode(uidb64))
+            user = User.objects.get(pk=uid)
+        except (TypeError, ValueError, OverflowError, User.DoesNotExist):
+            user = None
+
+        if user is not None and default_token_generator.check_token(user, token):
+            # Используем твой кастомный валидатор или стандартный set_password
+            user.set_password(new_password)
+            user.save()
+            return Response({"message": "Пароль успешно изменен"}, status=status.HTTP_200_OK)
+        return Response({"error": "Неверная или устаревшая ссылка"}, status=status.HTTP_400_BAD_REQUEST)
