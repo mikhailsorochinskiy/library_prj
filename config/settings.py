@@ -20,7 +20,7 @@ DEBUG = os.getenv('DEBUG', 'False').lower() in ('true', '1', 't')
 
 FRONTEND_URL = os.getenv('FRONTEND_URL', 'http://localhost:3000')
 
-ALLOWED_HOSTS = ['library-prj.onrender.com', '127.0.0.1']
+ALLOWED_HOSTS = ['library-prj.onrender.com', '127.0.0.1', '144.31.89.239']
 
 
 # Application definition
