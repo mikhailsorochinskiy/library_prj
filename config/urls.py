@@ -7,16 +7,24 @@ from drf_yasg import openapi
 from config import settings
 
 schema_view = get_schema_view(
-   openapi.Info(
-      title="Snippets API",
-      default_version='v1',
-      description="Test description",
-      terms_of_service="https://www.google.com/policies/terms/",
-      contact=openapi.Contact(email="contact@snippets.local"),
-      license=openapi.License(name="BSD License"),
-   ),
-   public=True,
-   permission_classes=(permissions.AllowAny,),
+    openapi.Info(
+        title="Online Library API",  # Твое название
+        default_version='v1',
+        description="""
+      Документация REST API для дипломного проекта "Онлайн-библиотека".
+
+      Функционал:
+      - Авторизация по JWT токенам
+      - Работа с книгами и авторами
+      - Система комментариев, рейтингов и избранного
+      - Геймификация (начисление баллов)
+      """,
+        terms_of_service="https://www.google.com/policies/terms/",
+        contact=openapi.Contact(email="твоя_почта@mail.ru"),  # Твоя почта
+        license=openapi.License(name="MIT License"),
+    ),
+    public=True,
+    permission_classes=(permissions.AllowAny,),
 )
 
 urlpatterns = [
