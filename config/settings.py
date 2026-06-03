@@ -42,9 +42,9 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'whitenoise.middleware.WhiteNoiseMiddleware',
-    'corsheaders.middleware.CorsMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -177,19 +177,20 @@ REST_FRAMEWORK = {
 }
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=5),
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=25),
     "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
 }
 
 # Вариант A: Разреши всё (для разработки)
-CORS_ALLOW_ALL_ORIGINS = True  # ← поставь True пока
+# CORS_ALLOW_ALL_ORIGINS = True  # ← поставь True пока
 
 # Вариант B: Разреши только определённые домены (для продакшена)
-# CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:3000",  # React dev server
-#     "http://localhost:8080",  # Vue dev server
-#     "https://ваш-фронтенд.сайт",  # твой фронтенд
-# ]
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",    # самый частый порт для React/Vue
+    "http://localhost:8080",    # для Vue CLI по умолчанию
+    "http://127.0.0.1:5500",    # для Live Server в VS Code
+    "http://192.168.1.100:3000", # если фронтендер тестирует с телефона или другого устройства в локальной сети
+]
 
 # Разреши отправку cookies (если нужна аутентификация)
 CORS_ALLOW_CREDENTIALS = True
