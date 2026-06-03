@@ -182,16 +182,16 @@ SIMPLE_JWT = {
 }
 
 # Вариант A: Разреши всё (для разработки)
-# CORS_ALLOW_ALL_ORIGINS = True  # ← поставь True пока
+CORS_ALLOW_ALL_ORIGINS = True  # ← поставь True пока
 
 # Вариант B: Разреши только определённые домены (для продакшена)
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",    # самый частый порт для React/Vue
-    "http://localhost:8080",    # для Vue CLI по умолчанию
-    "http://127.0.0.1:5500",    # для Live Server в VS Code
-    "http://192.168.1.100:3000", # если фронтендер тестирует с телефона или другого устройства в локальной сети
-    "http://localhost:5173",
-]
+# CORS_ALLOWED_ORIGINS = [
+#     "http://localhost:3000",    # самый частый порт для React/Vue
+#     "http://localhost:8080",    # для Vue CLI по умолчанию
+#     "http://127.0.0.1:5500",    # для Live Server в VS Code
+#     "http://192.168.1.100:3000", # если фронтендер тестирует с телефона или другого устройства в локальной сети
+#     "http://localhost:5173",
+# ]
 
 # Разреши отправку cookies (если нужна аутентификация)
 CORS_ALLOW_CREDENTIALS = True

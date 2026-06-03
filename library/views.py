@@ -3,7 +3,7 @@ from rest_framework import viewsets
 from django_filters.rest_framework import DjangoFilterBackend
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from .models import Author, Book
@@ -43,7 +43,7 @@ class BookViewSet(viewsets.ModelViewSet):
             permission_classes = [IsModeratorOrReadOnly]
         elif self.action == 'list':
             # Список книг могут видеть все аутентифицированные
-            permission_classes = [IsAuthenticated]
+            permission_classes = [AllowAny]
         else:
             # Детали книги могут видеть все аутентифицированные
             permission_classes = [IsAuthenticated]
