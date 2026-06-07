@@ -11,6 +11,8 @@ from .serializers import AuthorSerializer, BookSerializer
 from .filters import BookFilter
 from .paginators import ListPagination
 from users.permissions import IsModeratorOrReadOnly
+from django.http import FileResponse
+import os
 
 
 class AuthorViewSet(viewsets.ModelViewSet):
@@ -95,12 +97,6 @@ def upload_book_text(request, book_id):
 @api_view(['GET'])
 @permission_classes([])  # Доступно всем
 def download_book_text(request, book_id):
-    """
-    Скачивание текста книги
-    """
-    from django.http import FileResponse
-    import os
-
     book = get_object_or_404(Book, id=book_id)
 
     if not book.has_text():
@@ -109,18 +105,25 @@ def download_book_text(request, book_id):
             status=status.HTTP_404_NOT_FOUND
         )
 
-    # Увеличиваем счетчик скачиваний
+    # Проверяем, существует ли файл на диске
+    if not book.text_file or not os.path.exists(book.text_file.path):
+        return Response(
+            {'error': 'Файл книги отсутствует на сервере'},
+            status=status.HTTP_404_NOT_FOUND
+        )
+
+    # Увеличиваем счётчик (лучше делать после успешной отправки, но для простоты оставим)
     book.increment_download_count()
 
-    # Отправляем файл
+    # Открываем файл явно в бинарном режиме
+    file_handle = open(book.text_file.path, 'rb')
     response = FileResponse(
-        book.text_file,
-        as_attachment=True,  # Скачивается как файл
+        file_handle,
+        as_attachment=True,
         filename=f"{book.title}_{book.author.name}{book.get_file_extension()}"
     )
-
-    # Защита от XSS
     response['X-Content-Type-Options'] = 'nosniff'
+    # FileResponse сам закроет file_handle при завершении
     return response
 
 
