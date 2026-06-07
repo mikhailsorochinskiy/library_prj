@@ -233,3 +233,5 @@ if os.getenv('EMAIL_HOST_USER'):
 else:
     EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
     DEFAULT_FROM_EMAIL = 'noreply@library.com'
+
+SECURE_CROSS_ORIGIN_OPENER_POLICY = None
