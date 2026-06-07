@@ -110,7 +110,7 @@ def download_book_text(request, book_id):
         )
 
     # Увеличиваем счетчик скачиваний
-    book.increment_download_count()
+    # book.increment_download_count()
 
     # Отправляем файл
     response = FileResponse(
